@@ -4,21 +4,34 @@ from qiskit_nature.units import DistanceUnit
 
 
 # ión HeH+
-driver = PySCFDriver(
-    atom="He 0 0 0; H 0 0 0.774",  # Coordenadas atómicas en Angstroms
-    unit=DistanceUnit.ANGSTROM,    # Define la unidad de distancia
 
-    charge=1,  # Carga total del sistema (HeH+ tiene carga +1)
-    spin=0,    # REQUEIERE MAS ARGUMENTACION !!!!!
-    basis="sto-3g"  # Base de funciones de onda
+def hamiltoniano_heh(distancia: float):
+    """
+    Genera el operador Hamiltoniano en segunda cuantización para la molécula HeH+
+    a una distancia interatómica específica.
+
+    Args:
+        distancia (float): Distancia entre el átomo de He y H en Angstroms.
+
+    Returns:
+        FermionicOp: El hamiltoniano en segunda cuantización.
+    """
     
-)
+    # Usamos un f-string para insertar la variable 'distancia' dinámicamente
+    # La estructura es: "Átomo X Y Z; Átomo X Y Z"
+    atom_config = f"He 0 0 0; H 0 0 {distancia}"
 
+    driver = PySCFDriver(
+        atom=atom_config, 
+        unit=DistanceUnit.ANGSTROM,
+        charge=1,  # Carga neta +1
+        spin=0,    # 0 electrones desapareados (Singlete)
+        basis="sto-3g"
+    )
 
-problem = driver.run()  
-
-
-fermionic_op = problem.hamiltonian.second_q_op() # Obtiene hamiltoniano Fermionico de segunda Cuantizacion 
-
-# Imprimir el Hamiltoniano
-print(fermionic_op)
+    problem = driver.run()
+    
+    # Extraemos el Hamiltoniano fermiónico
+    fermionic_op = problem.hamiltonian.second_q_op()
+    
+    return fermionic_op
