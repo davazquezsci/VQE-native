@@ -30,6 +30,7 @@ def hamiltoniano_heh(R_AB: float):
         "fermionic_op": problem.hamiltonian.second_q_op(),
         "num_spatial_orbitals": problem.num_spatial_orbitals,
         "num_particles": problem.num_particles,
+        "num_electrones": sum(problem.num_particles),
         "nuclear_repulsion_energy": problem.nuclear_repulsion_energy,
         "reference_energy": problem.reference_energy,
     }

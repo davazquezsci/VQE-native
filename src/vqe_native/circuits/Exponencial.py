@@ -24,6 +24,7 @@ def B(op,num_spin_orbitals):
             qc.sdg(i)
             qc.h(i)
 
+
     return qc 
 
 def B_dag(op,num_spin_orbitals):
@@ -34,7 +35,7 @@ def B_dag(op,num_spin_orbitals):
         elif op[i]=='Y':
             qc.h(i)
             qc.s(i)
-            
+
     return qc 
 
 def CnotChain(op,num_spin_orbitals):
@@ -86,7 +87,14 @@ def QuantumExp(num_spin_orbitals: int, Op_Cluster_PAULI: dict):
         theta = ExtraerTheta(coef)
 
         qc.compose(B(op, num_spin_orbitals), inplace=True)
+        qc.barrier()
         qc.compose(CnotChain(op, num_spin_orbitals), inplace=True)
+        qc.barrier()
         qc.compose(D(op, theta, num_spin_orbitals), inplace=True)
+        qc.barrier()
         qc.compose(CnotChain_dag(op, num_spin_orbitals), inplace=True)
+        qc.barrier()
         qc.compose(B_dag(op, num_spin_orbitals), inplace=True)
+        qc.barrier()
+
+    return qc
