@@ -6,7 +6,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
 from vqe_native.chemistry import pyscf_backend 
 from vqe_native.mapping import jordan_wigner
 from vqe_native.circuits import Cluster_Operator
-from vqe_native.circuits import Exponencial
+from vqe_native.circuits import uccsd
 from qiskit import QuantumCircuit
 from qiskit.visualization import circuit_drawer
 import matplotlib.pyplot as plt
@@ -41,7 +41,7 @@ print(jw_S_operator)
 
 
 
-Qxp = Exponencial.QuantumExp(num_spin_orbitals, jw_S_operator)
+Qxp = uccsd.QuantumExp(num_spin_orbitals, jw_S_operator)
 
 print(Qxp)
 print("size =", Qxp.size())
