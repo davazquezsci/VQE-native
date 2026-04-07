@@ -52,6 +52,7 @@ Obtener Estado inicial de Hartree Fock
 #------------------------------------------------
 '''
 HF_state= uccsd.Estado_HF(num_spin_orbitals,num_electrones)
+
 print(HF_state)
 
 '''
@@ -72,9 +73,7 @@ jw_S_operator=jordan_wigner.JWdic(S_operator,num_spin_orbitals)
 #print(jw_S_operator)
 
 
-#Qxp = uccsd.QuantumExp(num_spin_orbitals, jw_S_operator)
-Qxp=QuantumCircuit(num_spin_orbitals)
-
+Qxp = uccsd.QuantumExp(num_spin_orbitals, jw_S_operator)
 print(Qxp)
 
 '''
@@ -101,7 +100,7 @@ Circuitos_NT,Coeficientes_NT,Cadenas_Pauli_NT,Coeficientes_T=measurement.Generar
 
 backend=measurement.Obtener_Backend("simulador")
 
-Count_list=measurement.Ejecutar_QCircuit_1point(Circuitos_NT,backend,10000)
+Count_list=measurement.Ejecutar_QCircuit_1point(Circuitos_NT,backend,100000)
 
 E=measurement.PostProcesado_1point(Count_list, Coeficientes_NT,Coeficientes_T)
 
