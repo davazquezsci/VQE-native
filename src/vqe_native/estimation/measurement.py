@@ -155,7 +155,7 @@ def PostProcesado_1point(counts_list, Coeficientes_NT,Coeficientes_T):
     
 
 
-def EvaluarPuntos_VQE():ç
+def EvaluarPuntos_VQE():
     ...
         
 
