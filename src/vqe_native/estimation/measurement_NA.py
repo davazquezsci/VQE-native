@@ -9,6 +9,7 @@ sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
 from vqe_native.circuits import uccsd
 
 
+
 def pre_measurement(PauliChain,num_spin_orbitals):
     qc=QuantumCircuit(num_spin_orbitals)
     for i in range(num_spin_orbitals):
@@ -18,6 +19,14 @@ def pre_measurement(PauliChain,num_spin_orbitals):
             qc.sdg(i)
             qc.h(i)
     return qc
+
+'''
+==================================================================
+==================================================================
+Primera aproximación: Sin agrupamiento de mediciones. 
+==================================================================
+==================================================================
+'''
 
 def Circuito_Medicion_PauliChainH(PauliChain,
     HF_state:QuantumCircuit,
@@ -43,7 +52,7 @@ def Circuito_Medicion_PauliChainH(PauliChain,
         for i in range(len(soporte)):
             qc.measure(soporte[i],i)
 
-        return qc 
+        return qc, soporte
 
 
 
@@ -69,14 +78,13 @@ def Generar_Circuitos_Medicion_Hamiltoniano(
 
         for PauliCHain, coef in Hamiltoniano.items(): 
             if PauliCHain != Trivial_Chain:
-                Circuitos_NT.append( Circuito_Medicion_PauliChainH(PauliCHain,HF_state,anzats,num_spin_orbitals))
+                Circuitos_NT.append( Circuito_Medicion_PauliChainH(PauliCHain,HF_state,anzats,num_spin_orbitals)[0])
                 Coeficientes_NT.append(coef)
                 Cadenas_Pauli_NT.append(PauliCHain)
             else:
                  Coeficientes_T.append(coef)
 
         return Circuitos_NT,Coeficientes_NT,Cadenas_Pauli_NT,Coeficientes_T
-
              
             
 def Obtener_Backend(

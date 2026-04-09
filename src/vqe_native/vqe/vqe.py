@@ -7,13 +7,14 @@ from vqe_native.chemistry import pyscf_backend
 from vqe_native.mapping import jordan_wigner
 from vqe_native.circuits import Cluster_Operator
 from vqe_native.circuits import uccsd
-from vqe_native.estimation import measurement 
+from vqe_native.estimation import measurement_NA 
+from vqe_native.estimation import measurement_A 
 from vqe_native.optim import cobyla 
 from typing import Literal
 
 
 
-def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shots):
+def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shots,FO):
     '''
     #------------------------------------------------
     Obtener Hamiltoniano 
@@ -29,6 +30,7 @@ def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shot
     #E_electron_HF=E_total-E_Repulsion
 
     HamOPJW=jordan_wigner.JWdic(fermionic_op,num_spin_orbitals) 
+    HamOPJW=measurement_A.Preprocesamiento_hamiltoniano(HamOPJW)
 
     '''
     #------------------------------------------------
@@ -50,7 +52,7 @@ def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shot
     #------------------------------------------------
     '''
 
-    backend=measurement.Obtener_Backend(tipo) 
+    backend=measurement_NA.Obtener_Backend(tipo) 
 
     '''
     #------------------------------------------------
@@ -58,7 +60,7 @@ def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shot
     #------------------------------------------------
     '''
 
-    cob=cobyla.cobyla(Theta_0,HamOPJW,HF_state,num_spin_orbitals,num_electrones,backend,Shots)
+    cob=cobyla.cobyla(Theta_0,HamOPJW,HF_state,num_spin_orbitals,num_electrones,backend,Shots,FO)
 
     Min_E=cob.fun
     Min_E_TOT=Min_E+E_Repulsion  
@@ -66,3 +68,9 @@ def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shot
     Dif_E_TOT=abs(Min_E_TOT-E_total)
 
     return cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total
+
+
+
+
+
+
