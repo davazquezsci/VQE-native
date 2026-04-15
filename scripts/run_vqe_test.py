@@ -7,7 +7,8 @@ from vqe_native.chemistry import pyscf_backend
 from vqe_native.mapping import jordan_wigner
 from vqe_native.circuits import Cluster_Operator
 from vqe_native.circuits import uccsd
-from vqe_native.estimation import measurement
+from vqe_native.estimation import measurement_NA
+from vqe_native.optim import cobyla 
 from qiskit import QuantumCircuit
 from qiskit.visualization import circuit_drawer
 import matplotlib.pyplot as plt
@@ -87,28 +88,58 @@ fig.savefig("/mnt/c/Users/dangv/Desktop/circuito.png", dpi=300, bbox_inches="tig
 print("Guardado:", Path("circuito.png").resolve())
 
 '''
-
-
-
 '''
 #------------------------------------------------
-Obtener MEDICION DE PUNTO 
+Backend de Medicion
 #------------------------------------------------
 '''
 
-Circuitos_NT,Coeficientes_NT,Cadenas_Pauli_NT,Coeficientes_T=measurement.Generar_Circuitos_Medicion_Hamiltoniano(HamOPJW, HF_state, Qxp, num_spin_orbitals)
-
-backend=measurement.Obtener_Backend("simulador")
-
-Count_list=measurement.Ejecutar_QCircuit_1point(Circuitos_NT,backend,100000)
-
-E=measurement.PostProcesado_1point(Count_list, Coeficientes_NT,Coeficientes_T)
-
-print(E) 
-
-print(abs(E-E_electron_HF))
+Shots=10000
+backend=measurement_NA.Obtener_Backend("simulador")
 
 
+import os
+print("Directorio actual:", os.getcwd())
+'''
+========================================================
+=========================================================
+Obtener MEDICION DE PUNTO  sin Agrupamiento
+========================================================
+=========================================================
+'''
+measurement_NA.TOTAL_CIRCUITOS = 0
+measurement_NA.TOTAL_SHOTS = 0
+
+
+
+E=cobyla.funcion_objetivo(Theta_0,HamOPJW,HF_state,num_spin_orbitals,num_electrones,backend,Shots)
+
+print("Energia en el Circuito:",E) 
+print("Energia de Hartree Fock", E_electron_HF)
+print()
+print("Circuitos totales:", measurement_NA.TOTAL_CIRCUITOS)
+print("Shots totales:", measurement_NA.TOTAL_SHOTS)
+
+
+'''
+========================================================
+=========================================================
+Obtener MEDICION DE PUNTO  CON Agrupamiento
+========================================================
+=========================================================
+'''
+measurement_NA.TOTAL_CIRCUITOS = 0
+measurement_NA.TOTAL_SHOTS = 0
+
+
+
+E=cobyla.funcion_objetivo_Agrupada(Theta_0,HamOPJW,HF_state,num_spin_orbitals,num_electrones,backend,Shots)
+
+print("Energia en el Circuito:",E) 
+print("Energia de Hartree Fock", E_electron_HF)
+print()
+print("Circuitos totales:", measurement_NA.TOTAL_CIRCUITOS)
+print("Shots totales:", measurement_NA.TOTAL_SHOTS)
 
 
 

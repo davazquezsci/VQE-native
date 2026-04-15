@@ -92,7 +92,7 @@ def hamiltoniano_heh(R_AB: float):
         basis="sto-3g"
     ) 
     problem = driver.run()
-
+    
     fermionic_op_block = problem.hamiltonian.second_q_op()
 
     fermionic_dict_interleaved = reindex_fermionic_dict_block_to_interleaved(

@@ -1,6 +1,7 @@
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 from qiskit_ibm_runtime import QiskitRuntimeService
+from qiskit_ibm_runtime import SamplerV2 as Sampler
 from typing import Literal
 import numpy as np
 import sys
@@ -107,17 +108,40 @@ def Obtener_Backend(
      
 
 
-def Ejecutar_QCircuit_1point(circuitos,backend,shots:int):
+def Ejecutar_QCircuit_1point(circuitos, backend, shots: int):
+    global TOTAL_CIRCUITOS
+    global TOTAL_SHOTS
 
-    qc_t = transpile(circuitos, backend) #circuito adaptado al backend 
+    num_circuitos = len(circuitos)
 
-    # Ejecutar el circuito con cierto número de shots.
-    job = backend.run(qc_t, shots=shots)
+    TOTAL_CIRCUITOS += num_circuitos
+    TOTAL_SHOTS += num_circuitos * shots
+
+    qc_t = transpile(circuitos, backend)
+
+    # Caso simulador local
+    if isinstance(backend, AerSimulator):
+        job = backend.run(qc_t, shots=shots)
+        result = job.result()
+        counts_list = result.get_counts()
+        if isinstance(counts_list, dict):
+            counts_list = [counts_list]
+        return counts_list
+
+    # Caso hardware IBM Runtime
+    sampler = Sampler(mode=backend)
+    job = sampler.run(qc_t, shots=shots)
     result = job.result()
-    counts_list = result.get_counts()
+
+    counts_list = []
+    for pub_result in result:
+        # Toma el primer registro clásico disponible
+        data_bin = pub_result.data
+        reg_name = list(data_bin.keys())[0]
+        counts = getattr(data_bin, reg_name).get_counts()
+        counts_list.append(counts)
 
     return counts_list
-
 
 
 def PostProcesado_1point(counts_list, Coeficientes_NT,Coeficientes_T): 
@@ -163,8 +187,6 @@ def PostProcesado_1point(counts_list, Coeficientes_NT,Coeficientes_T):
     
 
 
-def EvaluarPuntos_VQE():
-    ...
         
 
 

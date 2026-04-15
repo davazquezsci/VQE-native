@@ -17,21 +17,36 @@ import matplotlib
 matplotlib.use("Agg") 
 import matplotlib.pyplot as plt
  
-nombre_corrida = "HeHplus_40 pts zoom 50000 v2"
+nombre_corrida = "HeHplus_5 pts hardware 10000 v1"
 
 
 '''
 =============================================================================================
-OBTENCIÓN CURVA de energias de  Energia de estado base de HeH^+ 
+OBTENCIÓN CURVA de energias de  Energia de estado base de HeH^+ HARDWARE
 =============================================================================================
 '''
 print("Resultados con Agrupamiento")
-n_shots=50000
+n_shots=2000
 
 measurement_NA.TOTAL_CIRCUITOS = 0
 measurement_NA.TOTAL_SHOTS = 0 
 
-R_AB=np.linspace(0.8,1.1,40)
+R_AB = np.loadtxt("datos/5_puntos_hardware_sugeridos.csv", delimiter=",", skiprows=1) 
+
+datos_thetas = np.loadtxt("datos/Thetas_iniciales_sim.csv", delimiter=",", skiprows=1)
+
+R_AB_thetas = datos_thetas[:, 0]
+thetas = datos_thetas[:, 1:]  
+
+if not np.allclose(R_AB, R_AB_thetas):
+    raise ValueError("R_AB y R_AB_thetas no coinciden")
+
+backend = measurement_NA.Obtener_Backend("hardware", "ibm_kingston")
+
+
+print("Backend usado:", backend.name)
+print("Número de puntos:", len(R_AB))
+print("Dimensión theta:", thetas.shape[1])
 
 E_0=[]
 E_HF=[]
@@ -39,10 +54,12 @@ E_qiskit_tot=[]
 E_exacta=[]
 evaluaciones_totales = 0
 j=0
-for r_AB in R_AB: 
+
+for i, r_AB in enumerate(R_AB):
+    theta_ini = thetas[i]
 
 
-    cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total=vqe.VQE_HeH_plus(r_AB,"simulador",None,n_shots,cobyla.funcion_objetivo_Agrupada,None) 
+    cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total=vqe.VQE_HeH_plus(r_AB,"hardware", backend,n_shots,cobyla.funcion_objetivo_Agrupada,theta_ini) 
     E_qiskit_VQE_tot, E_fci= qiskit_pipeline.HeHplus_Qiskit_Exact(r_AB)
 
     E_0.append(Min_E_TOT) 

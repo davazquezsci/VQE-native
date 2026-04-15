@@ -14,7 +14,7 @@ from typing import Literal
 
 
 
-def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shots,FO):
+def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"],backend_o_nombre=None,Shots=10000,FO=None,theta_inicial=None):
     '''
     #------------------------------------------------
     Obtener Hamiltoniano 
@@ -44,7 +44,13 @@ def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shot
     #------------------------------------------------
     '''
 
-    Theta_0=Cluster_Operator.Theta_Inicial(num_spin_orbitals, num_electrones)
+    if theta_inicial is None:
+        Theta_0 = Cluster_Operator.Theta_Inicial(
+            num_spin_orbitals,
+            num_electrones
+        )
+    else:
+        Theta_0 = np.array(theta_inicial)
 
     '''
     #------------------------------------------------
@@ -52,7 +58,10 @@ def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"], Shot
     #------------------------------------------------
     '''
 
-    backend=measurement_NA.Obtener_Backend(tipo) 
+    if hasattr(backend_o_nombre, "run"):
+        backend = backend_o_nombre
+    else:
+        backend = measurement_NA.Obtener_Backend(tipo, backend_o_nombre)
 
     '''
     #------------------------------------------------

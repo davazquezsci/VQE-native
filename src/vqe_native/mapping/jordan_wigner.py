@@ -1,16 +1,16 @@
 import re #expresiones regulares
 
-def validar_operador(op):
-    # Patrón: +_ o -_ seguido de un número entero (uno o más dígitos)
-    patron = r'^[\+\-]_\d+$'
-    return bool(re.match(patron, op))
-
-
 '''
 =================================================================
 Funciones Utiles
 ===============================================================
 '''
+
+def validar_operador(op):
+    # Patrón: +_ o -_ seguido de un número entero (uno o más dígitos)
+    patron = r'^[\+\-]_\d+$'
+    return bool(re.match(patron, op))
+
 
 def multiplicar_pauli(a, b):
     """Multiplica dos matrices de Pauli representadas como 'I','X','Y','Z'"""

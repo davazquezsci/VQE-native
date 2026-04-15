@@ -38,6 +38,8 @@ Primera aproximación: Sin agrupamiento de mediciones.
 '''
 print("Resultados sin Agrupamiento")
 
+measurement_NA.TOTAL_CIRCUITOS = 0
+measurement_NA.TOTAL_SHOTS = 0
 
 cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total=vqe.VQE_HeH_plus(0.774,"simulador",n_shots,cobyla.funcion_objetivo) 
 
@@ -45,6 +47,10 @@ print("Shots:", n_shots)
 print("VQE:", Min_E_TOT)
 print("HF :", E_total)
 print("Error HF:", abs(E_total - Min_E_TOT))
+print()
+print("Circuitos totales:", measurement_NA.TOTAL_CIRCUITOS)
+print("Shots totales:", measurement_NA.TOTAL_SHOTS)
+print("Evaluaciones COBYLA:", cob.nfev)
 print()
 
 '''
@@ -57,10 +63,17 @@ Segunda aproximación: CON agrupamiento de mediciones.
 
 print("Resultados con Agrupamiento")
 
+measurement_NA.TOTAL_CIRCUITOS = 0
+measurement_NA.TOTAL_SHOTS = 0
+
 cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total=vqe.VQE_HeH_plus(0.774,"simulador",n_shots,cobyla.funcion_objetivo_Agrupada) 
 
 print("Shots:", n_shots)
 print("VQE:", Min_E_TOT)
 print("HF :", E_total)
 print("Error HF:", abs(E_total - Min_E_TOT))
+print()
+print("Circuitos totales:", measurement_NA.TOTAL_CIRCUITOS)
+print("Shots totales:", measurement_NA.TOTAL_SHOTS)
+print("Evaluaciones COBYLA:", cob.nfev)
 print()
