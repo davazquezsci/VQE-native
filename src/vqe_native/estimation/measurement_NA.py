@@ -108,6 +108,7 @@ def Obtener_Backend(
      
 
 
+
 def Ejecutar_QCircuit_1point(circuitos, backend, shots: int):
     global TOTAL_CIRCUITOS
     global TOTAL_SHOTS
@@ -117,7 +118,23 @@ def Ejecutar_QCircuit_1point(circuitos, backend, shots: int):
     TOTAL_CIRCUITOS += num_circuitos
     TOTAL_SHOTS += num_circuitos * shots
 
-    qc_t = transpile(circuitos, backend)
+    qc_t = transpile(
+        circuitos,
+        backend=backend,
+        optimization_level=1,
+        layout_method="sabre",
+        routing_method="sabre",
+        seed_transpiler=1234
+    )
+
+    # Diagnóstico útil
+    if isinstance(qc_t, list):
+        print("\n--- Diagnóstico de circuitos transpileados ---")
+        for i, qc in enumerate(qc_t[:3]):  # muestra solo los primeros 3
+            print(f"Circuito {i}: depth={qc.depth()}, ops={qc.count_ops()}")
+    else:
+        print("\n--- Diagnóstico de circuito transpileado ---")
+        print(f"depth={qc_t.depth()}, ops={qc_t.count_ops()}")
 
     # Caso simulador local
     if isinstance(backend, AerSimulator):
@@ -135,14 +152,12 @@ def Ejecutar_QCircuit_1point(circuitos, backend, shots: int):
 
     counts_list = []
     for pub_result in result:
-        # Toma el primer registro clásico disponible
         data_bin = pub_result.data
         reg_name = list(data_bin.keys())[0]
         counts = getattr(data_bin, reg_name).get_counts()
         counts_list.append(counts)
 
     return counts_list
-
 
 def PostProcesado_1point(counts_list, Coeficientes_NT,Coeficientes_T): 
         E=0
