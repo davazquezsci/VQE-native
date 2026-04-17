@@ -26,7 +26,7 @@ OBTENCIÓN CURVA de energias de  Energia de estado base de HeH^+ HARDWARE
 =============================================================================================
 '''
 print("Resultados con Agrupamiento")
-n_shots=10000
+n_shots=100000
 
 measurement_NA.TOTAL_CIRCUITOS = 0
 measurement_NA.TOTAL_SHOTS = 0 
