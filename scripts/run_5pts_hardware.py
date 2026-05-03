@@ -14,7 +14,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from google.colab import files
+
 
 # Rutas base del repo en Colab
 

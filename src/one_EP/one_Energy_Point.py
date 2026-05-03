@@ -77,7 +77,7 @@ def one_EP(
     if hasattr(backend_o_nombre, "run"):
         backend = backend_o_nombre
     else:
-        backend = measurement_NA.Obtener_Backend(tipo, backend_o_nombre)
+        backend = measurement_NA.obtener_backend(tipo, backend_o_nombre)
 
     # Evaluar función objetivo
     E = FO(
