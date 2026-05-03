@@ -10,14 +10,11 @@ sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
 # CONFIGURACIÓN
 # =========================================================
 
-archivo_csv = "datos/HeHplus_40 pts zoom 50000 v2.csv"
+archivo_csv = "datos/HeHplus_40 pts zoom 100000 v2.csv"
 
 # Curva usada para localizar el mínimo:
-# opciones: "E_exacta", "E_qiskit_tot", "E_VQE", "E_HF"
 columna_referencia = "E_exacta"
 
-# Número de puntos vecinos al mínimo para el ajuste parabólico local
-# Por ejemplo 7 usa el punto mínimo y 3 vecinos a cada lado
 n_puntos_ajuste = 7
 
 # Separación para proponer 5 puntos alrededor del mínimo estimado

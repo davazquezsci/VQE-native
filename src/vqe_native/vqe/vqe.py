@@ -14,14 +14,14 @@ from typing import Literal
 
 
 
-def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"],backend_o_nombre=None,Shots=10000,FO=None,theta_inicial=None):
+def VQE_HeH_plus( R_AB,tipo: Literal["simulador", "hardware"],backend_o_nombre=None,Shots=10000,FO=None,theta_inicial=None):
     '''
     #------------------------------------------------
     Obtener Hamiltoniano 
     #------------------------------------------------
     '''
 
-    dataMol=pyscf_backend .hamiltoniano_heh(distancia_atomica) 
+    dataMol=pyscf_backend .hamiltoniano_heh(R_AB) 
     fermionic_op=dataMol["fermionic_op"]
     num_spin_orbitals=2*dataMol["num_spatial_orbitals"] 
     num_electrones=dataMol["num_electrones"]
@@ -61,7 +61,7 @@ def VQE_HeH_plus( distancia_atomica,tipo: Literal["simulador", "hardware"],backe
     if hasattr(backend_o_nombre, "run"):
         backend = backend_o_nombre
     else:
-        backend = measurement_NA.Obtener_Backend(tipo, backend_o_nombre)
+        backend = measurement_NA.obtener_backend(tipo, backend_o_nombre)
 
     '''
     #------------------------------------------------

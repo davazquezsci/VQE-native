@@ -2,13 +2,16 @@
 import sys
 import numpy as np
 from pathlib import Path
-sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
+sys.path.append(str(Path(__file__).resolve().parent.parent / "src")) 
+
+Qcircuit_path = Path(__file__).resolve().parent.parent / "Qcircuits" 
 from vqe_native.chemistry import pyscf_backend 
 from vqe_native.mapping import jordan_wigner
 from vqe_native.circuits import Cluster_Operator
 from vqe_native.circuits import uccsd
 from vqe_native.estimation import measurement_NA
 from vqe_native.optim import cobyla 
+from Latex_Circuit import latex_Qcircuit
 from qiskit import QuantumCircuit
 from qiskit.visualization import circuit_drawer
 import matplotlib.pyplot as plt
@@ -23,7 +26,7 @@ Obtener Hamiltoniano
 
 dataMol=pyscf_backend .hamiltoniano_heh(0.774) 
 fermionic_op=dataMol["fermionic_op"]
-#print(fermionic_op)
+print(fermionic_op)
 
 num_spin_orbitals=2*dataMol["num_spatial_orbitals"] 
 num_electrones=dataMol["num_electrones"]
@@ -52,9 +55,13 @@ E_electron_HF=E_total-E_Repulsion
 Obtener Estado inicial de Hartree Fock 
 #------------------------------------------------
 '''
-HF_state= uccsd.Estado_HF(num_spin_orbitals,num_electrones)
+HF_state= uccsd.Estado_HF(num_spin_orbitals,num_electrones) 
 
-print(HF_state)
+fig1 = HF_state.draw(output="mpl")
+fig1.savefig( Qcircuit_path / "circuitoHF.png", dpi=300, bbox_inches="tight")
+print("Guardado:", Path("circuitoHF.png").resolve())
+
+#print(HF_state)
 
 '''
 #------------------------------------------------
@@ -71,21 +78,35 @@ S_operator=Cluster_Operator.Operador_Cluster(num_spin_orbitals, num_electrones, 
 
 
 jw_S_operator=jordan_wigner.JWdic(S_operator,num_spin_orbitals)
-#print(jw_S_operator)
+print(jw_S_operator)
 
 
 Qxp = uccsd.QuantumExp(num_spin_orbitals, jw_S_operator)
 print(Qxp)
 
-'''
+
 #IMPRIMIR  CIRCUITO CUANTICO 
 
 print("size =", Qxp.size())
 print("depth =", Qxp.depth())
 
-fig = Qxp.draw(output="mpl")
-fig.savefig("/mnt/c/Users/dangv/Desktop/circuito.png", dpi=300, bbox_inches="tight")
-print("Guardado:", Path("circuito.png").resolve())
+fig2 = Qxp.draw(output="mpl")
+fig2.savefig( Qcircuit_path / "circuitoexp.png", dpi=300, bbox_inches="tight")
+print("Guardado:", Path("circuitoexp.png").resolve())
+
+ 
+''' 
+rutas = latex_Qcircuit.circuito_a_latex_imagen(
+    Qxp,
+    nombre_salida="circuito_uccsd",
+    carpeta_salida=Qcircuit_path,
+    compilar_pdf=False,
+    convertir_png=True,
+    dpi=300,
+    limpiar_aux=False
+)
+
+print("Archivo generado:", rutas)
 
 '''
 '''

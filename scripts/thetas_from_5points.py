@@ -17,14 +17,8 @@ import matplotlib
 matplotlib.use("Agg") 
 import matplotlib.pyplot as plt
  
-nombre_corrida = "Thetas_iniciales_sim"
+nombre_corrida = "Thetas_iniciales_sim_har_2"
 
-
-'''
-=============================================================================================
-OBTENCIÓN CURVA de energias de  Energia de estado base de HeH^+ HARDWARE
-=============================================================================================
-'''
 print("Resultados con Agrupamiento")
 n_shots=100000
 

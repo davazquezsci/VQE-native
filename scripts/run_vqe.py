@@ -17,7 +17,7 @@ import matplotlib
 matplotlib.use("Agg") 
 import matplotlib.pyplot as plt
  
-nombre_corrida = "HeHplus_40 pts zoom 50000 v2"
+nombre_corrida = "HeHplus_100pts sim har e id 30000 range 80-1.1 100 lim"
 
 
 '''
@@ -26,14 +26,17 @@ OBTENCIÓN CURVA de energias de  Energia de estado base de HeH^+
 =============================================================================================
 '''
 print("Resultados con Agrupamiento")
-n_shots=50000
+
 
 measurement_NA.TOTAL_CIRCUITOS = 0
 measurement_NA.TOTAL_SHOTS = 0 
+measurement_NA.DIAGNOSTICO_HECHO = False
 
-R_AB=np.linspace(0.8,1.1,40)
+n_shots=30000
+R_AB=np.linspace(0.8,1.1,100)
 
-E_0=[]
+E_0_sim_id=[]
+E_0_sim_hard=[]
 E_HF=[]
 E_qiskit_tot=[]
 E_exacta=[]
@@ -42,10 +45,15 @@ j=0
 for r_AB in R_AB: 
 
 
-    cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total=vqe.VQE_HeH_plus(r_AB,"simulador",None,n_shots,cobyla.funcion_objetivo_Agrupada,None) 
+    cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total=vqe.VQE_HeH_plus(r_AB,"simulador_ruidoso",None,n_shots,cobyla.funcion_objetivo_Agrupada,None) 
+
+    cob2,Min_E2,Min_E_TOT2,Dif_E_TOT2,E_total2=vqe.VQE_HeH_plus(r_AB,"simulador",None,n_shots,cobyla.funcion_objetivo_Agrupada,None) 
+
     E_qiskit_VQE_tot, E_fci= qiskit_pipeline.HeHplus_Qiskit_Exact(r_AB)
 
-    E_0.append(Min_E_TOT) 
+
+    E_0_sim_id.append(Min_E_TOT2) 
+    E_0_sim_hard.append(Min_E_TOT) 
     E_HF.append(E_total)
     E_qiskit_tot.append(E_qiskit_VQE_tot) 
     E_exacta.append(E_fci)
@@ -68,22 +76,27 @@ for r_AB in R_AB:
 
 plt.figure(figsize=(6,6))
 
-plt.plot(R_AB, E_HF, 'o-', 
-         color='#4C6A92',  
+plt.plot(R_AB, E_HF, '-', 
+         color="#9E21C4",  
          label="Hartree-Fock")
 
-plt.plot(R_AB, E_qiskit_tot, 'o-', 
+plt.plot(R_AB, E_qiskit_tot, '-', 
          color='#6A8F3A',  
          label="VQE (Qiskit)")
 
-plt.plot(R_AB, E_exacta, 'o-', 
+plt.plot(R_AB, E_exacta, '-', 
          color='#C2A878',  
          label="Full Configuration Interaction") 
 
 
-plt.plot(R_AB, E_0, 'o-', 
+plt.plot(R_AB, E_0_sim_hard, 'o-', 
+         color="#208B9E",  
+         label="VQE simulado hardware") 
+
+
+plt.plot(R_AB, E_0_sim_id, 'o-', 
          color='#6E2F33',  
-         label="VQE")
+         label="VQE simulado ideal")
 
 plt.xlabel(r"Distancia internuclear $R_{AB}$ ($\AA$)")
 plt.ylabel("Energía total (Hartree)")
@@ -103,12 +116,12 @@ print("Shots totales:", measurement_NA.TOTAL_SHOTS)
 print("Evaluaciones COBYLA:", evaluaciones_totales)
 print() 
 
-datos = np.column_stack((R_AB, E_0, E_HF,E_qiskit_tot,E_exacta))
+datos = np.column_stack((R_AB, E_0_sim_id, E_0_sim_hard, E_HF,E_qiskit_tot,E_exacta))
 
 np.savetxt(
     f"datos/{nombre_corrida}.csv",
     datos,
     delimiter=",",
-    header="R_AB,E_VQE,E_HF,E_qiskit_tot,E_exacta",
+    header="R_AB,E_VQE_sim_id,E_VQE_sim_hard,E_HF,E_qiskit_tot,E_exacta",
     comments=""
 )

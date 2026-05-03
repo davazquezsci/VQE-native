@@ -53,16 +53,8 @@ def one_EP(
     theta_inicial=None,
     FO=cobyla.funcion_objetivo_Agrupada
 ):
-    """
-    ------------------------------------------------
-    Ejecutar una evaluación de energía para una
-    distancia internuclear dada
-    ------------------------------------------------
-    """
 
-    # ------------------------------------------------
     # Obtener datos moleculares e iniciales
-    # ------------------------------------------------
     datos = initial(distancia_atomica)
 
     HamOPJW = datos["HamOPJW"]
@@ -72,9 +64,7 @@ def one_EP(
     E_Repulsion = datos["E_Repulsion"]
     E_total = datos["E_total"]
 
-    # ------------------------------------------------
     # Obtener theta inicial
-    # ------------------------------------------------
     if theta_inicial is None:
         Theta_0 = Cluster_Operator.Theta_Inicial(
             num_spin_orbitals,
@@ -83,17 +73,13 @@ def one_EP(
     else:
         Theta_0 = np.array(theta_inicial, dtype=float)
 
-    # ------------------------------------------------
     # Inicializar backend
-    # ------------------------------------------------
     if hasattr(backend_o_nombre, "run"):
         backend = backend_o_nombre
     else:
         backend = measurement_NA.Obtener_Backend(tipo, backend_o_nombre)
 
-    # ------------------------------------------------
     # Evaluar función objetivo
-    # ------------------------------------------------
     E = FO(
         Theta_0,
         HamOPJW,
@@ -103,10 +89,7 @@ def one_EP(
         backend,
         Shots
     )
-
-    # ------------------------------------------------
     # Energía total y diferencia
-    # ------------------------------------------------
     E_TOT = E + E_Repulsion
     Dif_E_TOT = abs(E_TOT - E_total)
 

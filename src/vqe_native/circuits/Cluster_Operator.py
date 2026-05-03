@@ -4,18 +4,18 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
 import math 
 
+"""
+Función para calcular el valor inicial de theta para el ansatz UCCSD.
 
+Parámetros:
+num_spin_orbitals (int): El número de orbitales de espín en el sistema.
+
+Retorna:
+float: El valor inicial de theta.
+    """  
 
 def Theta_Inicial(num_spin_orbitals,num_electrons):
-    """
-    Función para calcular el valor inicial de theta para el ansatz UCCSD.
-    
-    Parámetros:
-    num_spin_orbitals (int): El número de orbitales de espín en el sistema.
-    
-    Retorna:
-    float: El valor inicial de theta.
-    """
+
 
     #Obtenemos tamaño del vector de parámetros para el ansatz UCCSD.
     num_parameters = 0

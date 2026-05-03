@@ -86,8 +86,6 @@ def D(op,theta:float,num_spin_orbitals):
 def QuantumExp(num_spin_orbitals: int, Op_Cluster_PAULI: dict):
     qc=QuantumCircuit(num_spin_orbitals)
 
-
-
     for op, coef in Op_Cluster_PAULI.items():
         theta = ExtraerTheta(coef)
 

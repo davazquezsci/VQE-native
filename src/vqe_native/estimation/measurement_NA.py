@@ -34,7 +34,7 @@ def Circuito_Medicion_PauliChainH(PauliChain,
     anzats: QuantumCircuit,
     num_spin_orbitals: int): 
         '''
-        Contrucción de Circuito de Medición correspondiente a una sola cadena de Pauli no trivial..
+        Contrucción de Circuito de Medición correspondiente a una sola cadena de Pauli no trivial...
         '''
 
         soporte=uccsd.Soporte(PauliChain,num_spin_orbitals) 
@@ -88,30 +88,50 @@ def Generar_Circuitos_Medicion_Hamiltoniano(
         return Circuitos_NT,Coeficientes_NT,Cadenas_Pauli_NT,Coeficientes_T
              
             
-def Obtener_Backend(
-    tipo: Literal["simulador", "hardware"],
-    backend_name: str | None = None
-):
-    if tipo not in ("simulador", "hardware"):
-        raise ValueError("Tipo de medición del circuito invalida.")
+     
+def obtener_backend(modo: str, backend_name: str = "ibm_kingston"):
+    """
+    Devuelve el backend adecuado para:
+    - simulador: ideal
+    - simulador_ruidoso: AerSimulator con noise model del backend IBM
+    - hardware: backend real de IBM
+    """
+    modo = modo.lower().strip()
 
-    if tipo == "simulador":
+    if modo == "simulador":
         return AerSimulator()
 
-    # Hardware real
-    service = QiskitRuntimeService()
-
-    if backend_name is not None:
+    if modo == "hardware":
+        service = QiskitRuntimeService()
         return service.backend(backend_name)
 
-    return service.least_busy(operational=True, simulator=False)
-     
+    if modo == "simulador_ruidoso":
+        try:
+            service = QiskitRuntimeService()
+            backend_real = service.backend(backend_name)
 
+            # Esto configura noise model + basis gates + coupling map
+            backend_ruidoso = AerSimulator.from_backend(backend_real)
+            backend_ruidoso.set_options(method="density_matrix")
+            return backend_ruidoso
+
+        except Exception:
+            # Respaldo si no tienes acceso al servicio o falla la conexión
+            if FakeSherbrooke is None:
+                raise RuntimeError(
+                    "No se pudo acceder al backend real y tampoco hay fake backend disponible."
+                )
+
+            fake_backend = FakeSherbrooke()
+            return AerSimulator.from_backend(fake_backend)
+
+    raise ValueError(f"Modo no reconocido: {modo}")
 
 
 def Ejecutar_QCircuit_1point(circuitos, backend, shots: int):
     global TOTAL_CIRCUITOS
     global TOTAL_SHOTS
+    global DIAGNOSTICO_HECHO 
 
     num_circuitos = len(circuitos)
 
@@ -127,6 +147,10 @@ def Ejecutar_QCircuit_1point(circuitos, backend, shots: int):
         seed_transpiler=1234
     )
 
+    if not DIAGNOSTICO_HECHO:
+        diagnostico_circuitos(qc_t, etapa="después de transpilar")
+        DIAGNOSTICO_HECHO = True
+    '''
     # Diagnóstico útil
     if isinstance(qc_t, list):
         print("\n--- Diagnóstico de circuitos transpileados ---")
@@ -135,7 +159,7 @@ def Ejecutar_QCircuit_1point(circuitos, backend, shots: int):
     else:
         print("\n--- Diagnóstico de circuito transpileado ---")
         print(f"depth={qc_t.depth()}, ops={qc_t.count_ops()}")
-
+    '''
     # Caso simulador local
     if isinstance(backend, AerSimulator):
         job = backend.run(qc_t, shots=shots)
@@ -198,7 +222,27 @@ def PostProcesado_1point(counts_list, Coeficientes_NT,Coeficientes_T):
         return E
 
 
+def diagnostico_circuitos(circuitos, etapa=""):
+    """
+    Imprime métricas básicas de una lista de circuitos cuánticos.
+    """
 
+    if not isinstance(circuitos, list):
+        circuitos = [circuitos]
+
+    depths = [qc.depth() for qc in circuitos]
+    sizes = [qc.size() for qc in circuitos]
+
+    print(f"\n--- Diagnóstico de circuitos: {etapa} ---")
+    print(f"Número de circuitos: {len(circuitos)}")
+    print(f"Depth promedio: {sum(depths) / len(depths):.2f}")
+    print(f"Depth máximo: {max(depths)}")
+    print(f"Size promedio: {sum(sizes) / len(sizes):.2f}")
+    print(f"Size máximo: {max(sizes)}")
+
+    print("\nOperaciones de los primeros circuitos:")
+    for i, qc in enumerate(circuitos[:3]):
+        print(f"Circuito {i}: depth={qc.depth()}, size={qc.size()}, ops={qc.count_ops()}")
     
 
 
