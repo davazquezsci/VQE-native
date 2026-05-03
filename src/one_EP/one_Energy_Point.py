@@ -47,7 +47,7 @@ def initial(distancia_atomica: float):
 
 def one_EP(
     distancia_atomica: float,
-    tipo: Literal["simulador", "hardware"],
+    tipo: Literal["simulador", "hardware","simulador_ruidoso"],
     backend_o_nombre=None,
     Shots: int = 10000,
     theta_inicial=None,
