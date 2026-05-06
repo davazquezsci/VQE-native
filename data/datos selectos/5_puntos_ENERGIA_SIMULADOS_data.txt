@@ -1,0 +1,29 @@
+ Resultados con Agrupamiento
+Número de puntos: 5
+Dimensión theta: 5
+
+--- Diagnóstico de circuitos: después de transpilar ---
+Número de circuitos: 9
+Depth promedio: 130.89
+Depth máximo: 131
+Size promedio: 200.67
+Size máximo: 202
+
+Operaciones de los primeros circuitos:
+Circuito 0: depth=131, size=200, ops=OrderedDict({'barrier': 82, 'cx': 80, 'u2': 50, 'h': 48, 'rz': 16, 'measure': 4, 'x': 2})
+Circuito 1: depth=131, size=200, ops=OrderedDict({'barrier': 82, 'cx': 80, 'h': 50, 'u2': 48, 'rz': 16, 'measure': 4, 'x': 2})
+Circuito 2: depth=131, size=202, ops=OrderedDict({'barrier': 82, 'cx': 80, 'u2': 50, 'h': 50, 'rz': 16, 'measure': 4, 'x': 2})
+Punto 1/5 | R_AB = 0.894014
+Punto 2/5 | R_AB = 0.904014
+Punto 3/5 | R_AB = 0.914014
+Punto 4/5 | R_AB = 0.924014
+Punto 5/5 | R_AB = 0.934014
+
+Circuitos totales: 45
+Shots totales: 1350000
+Tiempo total (s): 8.744964838027954
+
+Archivo CSV de curva generado en:
+/content/5_puntos_ENERGIA_SIMULADOS_id.csv
+Archivo JSON generado en:
+/content/5_puntos_ENERGIA_SIMULADOS_id_resumen.json

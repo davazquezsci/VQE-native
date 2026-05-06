@@ -1,0 +1,66 @@
+{
+  "nombre_corrida": "5_puntos_ENERGIA_SIMULADOS_RUIDOSOS",
+  "numero_puntos": 5,
+  "shots_por_circuito": 30000,
+  "agrupamiento": true,
+  "circuitos_totales": 45,
+  "shots_totales": 1350000,
+  "tiempo_total_segundos": 97.4679856300354,
+  "resultados_punto_a_punto": [
+    {
+      "indice_punto": 0,
+      "R_AB": 0.894014443918703,
+      "shots_por_circuito": 30000,
+      "energia_electronica_vqe": -2.3671444053474655,
+      "energia_total_vqe": -1.1833218966182426,
+      "energia_total_referencia": -2.8538911968740046,
+      "error_absoluto_total": 1.670569300255762,
+      "energia_total_qiskit": -2.8625316451989,
+      "energia_exacta_fci": -2.862531651125263
+    },
+    {
+      "indice_punto": 1,
+      "R_AB": 0.904014443918703,
+      "shots_por_circuito": 30000,
+      "energia_electronica_vqe": -2.3561768560806335,
+      "energia_total_vqe": -1.1854495198532748,
+      "energia_total_referencia": -2.854128658489612,
+      "error_absoluto_total": 1.668679138636337,
+      "energia_total_qiskit": -2.8626569448446593,
+      "energia_exacta_fci": -2.8626570284958937
+    },
+    {
+      "indice_punto": 2,
+      "R_AB": 0.914014443918703,
+      "shots_por_circuito": 30000,
+      "energia_electronica_vqe": -2.3418863014402236,
+      "energia_total_vqe": -1.1839675957987015,
+      "energia_total_referencia": -2.854282332094725,
+      "error_absoluto_total": 1.6703147362960236,
+      "energia_total_qiskit": -2.8626946854574826,
+      "energia_exacta_fci": -2.8626947680736206
+    },
+    {
+      "indice_punto": 3,
+      "R_AB": 0.924014443918703,
+      "shots_por_circuito": 30000,
+      "energia_electronica_vqe": -2.3295638738541813,
+      "energia_total_vqe": -1.1841765600460037,
+      "energia_total_referencia": -2.8543581274452574,
+      "error_absoluto_total": 1.6701815673992537,
+      "energia_total_qiskit": -2.8626508750274833,
+      "energia_exacta_fci": -2.8626509564567857
+    },
+    {
+      "indice_punto": 4,
+      "R_AB": 0.934014443918703,
+      "shots_por_circuito": 30000,
+      "energia_electronica_vqe": -2.340817773830969,
+      "energia_total_vqe": -1.2076935178509196,
+      "energia_total_referencia": -2.8543616169806922,
+      "error_absoluto_total": 1.6466680991297726,
+      "energia_total_qiskit": -2.862531269337624,
+      "energia_exacta_fci": -2.8625313492411273
+    }
+  ]
+}
