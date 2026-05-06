@@ -1,6 +1,7 @@
 # ============================================================
-# generar_grafica_tesis.py
+# generar_grafica_error_tesis.py
 # Gráficas para tesis VQE con estilo LaTeX real:
+# Error absoluto respecto a FCI
 # XeLaTeX + fontspec + TeX Gyre Pagella
 # ============================================================
 
@@ -28,14 +29,12 @@ CARPETA_FIGURAS = Path("figuras")
 CARPETA_FIGURAS.mkdir(parents=True, exist_ok=True)
 
 ARCHIVO = "exp03_zoom_ideal_100000.csv"
-NOMBRE_FIGURA = "fig01_curva_zoom_ideal_100000"
+NOMBRE_FIGURA = "fig01_error_zoom_ideal_100000"
 
 # Columnas exactas de tu CSV.
 # Modifica estos nombres según cada archivo.
 COL_R = "R_AB"
 COL_VQE = "E_VQE_sim_id"
-COL_HF = "E_HF"
-COL_QISKIT = "E_qiskit_tot"
 COL_FCI = "E_exacta"
 
 # Límites visuales.
@@ -49,9 +48,9 @@ GUARDAR_PNG = False
 
 
 # ============================================================
-# 2. CONFIGURACIÓN DEL AJUSTE VQE
+# 2. CONFIGURACIÓN DEL AJUSTE DEL ERROR
 # ============================================================
-# Los datos VQE estimados con shots finitos se muestran como puntos.
+# Los errores |E_VQE - E_FCI| se muestran como puntos.
 # La línea suave NO interpola forzosamente los puntos.
 #
 # Opciones:
@@ -59,14 +58,14 @@ GUARDAR_PNG = False
 #   "polinomio"         -> ajuste global por mínimos cuadrados
 #   "ninguno"           -> sólo puntos
 
-METODO_AJUSTE_VQE = "smoothing_spline"
+METODO_AJUSTE_ERROR = "smoothing_spline"
 
 # Smoothing spline:
 # Más grande = curva más holgada.
 # Más chico = curva más pegada a los puntos.
 #
 # Valores sugeridos para probar:
-#   1e-5, 5e-5, 1e-4, 5e-4, 1e-3, 5e-3
+#   1e-7, 5e-7, 1e-6, 5e-6, 1e-5
 FACTOR_SUAVIZADO_SPLINE = 1e-6
 
 # Ajuste polinomial:
@@ -103,7 +102,7 @@ mpl.rcParams.update({
 """,
 
     # Tamaño de figura.
-    "figure.figsize": (5, 5*0.66),
+    "figure.figsize": (5, 5 * 0.66),
     "figure.dpi": 150,
     "savefig.dpi": 400,
 
@@ -143,11 +142,8 @@ mpl.rcParams.update({
 # ============================================================
 # Colores pensados para tesis, impresión y buena lectura.
 
-COLOR_FCI = "#333333"        # negro suave
-COLOR_HF = "#A8A8A8"         # gris medio
-COLOR_QISKIT = "#A10787"     # morado sobrio
-COLOR_VQE_PTS = "#3296B4"    # azul sobrio
-COLOR_VQE_FIT = "#B32611"    # rojo ladrillo
+COLOR_ERROR_PTS = "#3296B4"    # azul sobrio
+COLOR_ERROR_FIT = "#B32611"    # rojo ladrillo
 
 
 # ============================================================
@@ -166,8 +162,6 @@ def leer_datos() -> pd.DataFrame:
     columnas_necesarias = [
         COL_R,
         COL_VQE,
-        COL_HF,
-        COL_QISKIT,
         COL_FCI,
     ]
 
@@ -184,7 +178,7 @@ def leer_datos() -> pd.DataFrame:
     print("\nArchivo leído correctamente:")
     print(ruta)
 
-    print("\nColumnas disponibles:")
+    print("\nColumnas disponibles usadas:")
     print(df.columns.tolist())
 
     print("\nPrimeras filas usadas:")
@@ -196,27 +190,27 @@ def leer_datos() -> pd.DataFrame:
 def obtener_arrays(df: pd.DataFrame):
     R = df[COL_R].to_numpy(dtype=float)
     E_vqe = df[COL_VQE].to_numpy(dtype=float)
-    E_hf = df[COL_HF].to_numpy(dtype=float)
-    E_qiskit = df[COL_QISKIT].to_numpy(dtype=float)
     E_fci = df[COL_FCI].to_numpy(dtype=float)
 
-    return R, E_vqe, E_hf, E_qiskit, E_fci
+    error_vqe_fci = np.abs(E_vqe - E_fci)
+
+    return R, E_vqe, E_fci, error_vqe_fci
 
 
-def ajuste_vqe(R: np.ndarray, E_vqe: np.ndarray):
+def ajuste_error(R: np.ndarray, error: np.ndarray):
     """
-    Construye una curva suave para VQE.
+    Construye una curva suave para el error absoluto |E_VQE - E_FCI|.
 
     No es interpolación exacta. La curva puede separarse de los puntos,
-    lo cual es deseable cuando hay ruido estadístico por shots finitos.
+    lo cual es deseable cuando hay fluctuaciones estadísticas por shots finitos.
     """
 
-    if METODO_AJUSTE_VQE == "ninguno":
+    if METODO_AJUSTE_ERROR == "ninguno":
         return None, None
 
     R_dense = np.linspace(R.min(), R.max(), 700)
 
-    if METODO_AJUSTE_VQE == "smoothing_spline":
+    if METODO_AJUSTE_ERROR == "smoothing_spline":
         # Normalización para estabilidad numérica.
         R_min = R.min()
         R_scale = R.max() - R.min()
@@ -228,118 +222,86 @@ def ajuste_vqe(R: np.ndarray, E_vqe: np.ndarray):
         # Multiplicar por len(R) hace el parámetro menos dependiente del número de puntos.
         s = FACTOR_SUAVIZADO_SPLINE * len(R)
 
-        spline = UnivariateSpline(Rn, E_vqe, k=3, s=s)
-        E_dense = spline(Rdn)
+        spline = UnivariateSpline(Rn, error, k=3, s=s)
+        error_dense = spline(Rdn)
 
-        return R_dense, E_dense
+        return R_dense, error_dense
 
-    if METODO_AJUSTE_VQE == "polinomio":
-        coef = np.polyfit(R, E_vqe, deg=GRADO_POLINOMIO)
+    if METODO_AJUSTE_ERROR == "polinomio":
+        coef = np.polyfit(R, error, deg=GRADO_POLINOMIO)
         polinomio = np.poly1d(coef)
-        E_dense = polinomio(R_dense)
+        error_dense = polinomio(R_dense)
 
-        return R_dense, E_dense
+        return R_dense, error_dense
 
     raise ValueError(
-        "METODO_AJUSTE_VQE debe ser "
+        "METODO_AJUSTE_ERROR debe ser "
         "'smoothing_spline', 'polinomio' o 'ninguno'."
     )
 
 
 def graficar():
     df = leer_datos()
-    R, E_vqe, E_hf, E_qiskit, E_fci = obtener_arrays(df)
+    R, E_vqe, E_fci, error_vqe_fci = obtener_arrays(df)
+
+    print("\nResumen del error absoluto:")
+    print(f"Error mínimo: {error_vqe_fci.min():.12e} Eh")
+    print(f"Error máximo: {error_vqe_fci.max():.12e} Eh")
+    print(f"Error medio:  {error_vqe_fci.mean():.12e} Eh")
 
     fig, ax = plt.subplots()
 
     # --------------------------------------------------------
-    # VQE: ajuste suave
+    # Error: ajuste suave
     # --------------------------------------------------------
-
-    R_fit, E_fit = ajuste_vqe(R, E_vqe)
+    '''
+    R_fit, error_fit = ajuste_error(R, error_vqe_fci)
 
     if R_fit is not None:
         ax.plot(
             R_fit,
-            E_fit,
-            color=COLOR_VQE_FIT,
+            error_fit,
+            color=COLOR_ERROR_FIT,
             alpha=1,
             linestyle="-",
             linewidth=1.5,
-            label=r"VQE ideal, ajuste suave",
+            label=r"Ajuste suave",
             zorder=7,
         )
-
-
-
+    '''
     # --------------------------------------------------------
-    # VQE: datos estimados
+    # Error: datos estimados
     # --------------------------------------------------------
 
     ax.scatter(
         R,
-        E_vqe,
+        error_vqe_fci,
         s=17,
         marker="o",
-        color=COLOR_VQE_PTS,
+        color=COLOR_ERROR_PTS,
         alpha=1,
         linewidths=0.1,
-        label=r"VQE ideal, datos estimados",
+        label=r"$|E_{\mathrm{VQE}}-E_{\mathrm{FCI}}|$",
         zorder=6,
     )
 
-
-
-    # --------------------------------------------------------
-    # Referencias
-    # --------------------------------------------------------
-    ax.plot(
-            R,
-            E_hf,
-            color=COLOR_HF,
-            linestyle="--",
-            linewidth=1.55,
-            label=r"Hartree--Fock",
-            zorder=4,
-    )
-   
-    ax.plot(
-        R,
-        E_qiskit,
-        color=COLOR_QISKIT,
-        alpha=1,
-        linestyle="-.",
-        linewidth=1.45,
-        label=r"Qiskit",
-        zorder=3,
-    )
-
-    ax.plot(
-        R,
-        E_fci,
-        color=COLOR_FCI,
-        linestyle="-",
-        linewidth=1.85,
-        label=r"FCI",
-        zorder=5,
-    )
-
-
-
-   
-   
     # --------------------------------------------------------
     # Etiquetas
     # --------------------------------------------------------
 
     ax.set_xlabel(r"$R_{AB}$ (Å)")
-    ax.set_ylabel(r"$E\,(\mathrm{E}_\mathrm{h})$")
+    ax.set_ylabel(
+        r"$|E_{\mathrm{VQE}}-E_{\mathrm{FCI}}|\,(\mathrm{E}_\mathrm{h})$"
+    )
 
     if XLIM is not None:
         ax.set_xlim(*XLIM)
 
     if YLIM is not None:
         ax.set_ylim(*YLIM)
+    else:
+        # Como es un error absoluto, conviene iniciar el eje vertical en cero.
+        ax.set_ylim(bottom=0)
 
     # Limpieza visual.
     ax.spines["top"].set_visible(False)

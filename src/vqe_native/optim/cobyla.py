@@ -78,7 +78,7 @@ def cobyla(Theta_0,HamOPJW,HF_state,num_spin_orbitals,num_electrones,backend,Sho
         method="COBYLA",
         args=(HamOPJW,HF_state,num_spin_orbitals,num_electrones,backend,Shots),
         options={
-            "maxiter": 100,
+            "maxiter": 20,
             "rhobeg": 0.08,
             "tol": 1e-3,
             "disp": False,

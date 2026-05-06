@@ -17,7 +17,7 @@ import matplotlib
 matplotlib.use("Agg") 
 import matplotlib.pyplot as plt
  
-nombre_corrida = "HeHplus_100pts sim har e id 30000 range 80-1.1 100 lim"
+nombre_corrida = "HeHplus_100pts sim har e id 30000 range 80-1.1 20 lim"
 
 
 '''
@@ -45,7 +45,7 @@ j=0
 for r_AB in R_AB: 
 
 
-    cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total=vqe.VQE_HeH_plus(r_AB,"simulador_ruidoso",None,n_shots,cobyla.funcion_objetivo_Agrupada,None) 
+    cob,Min_E,Min_E_TOT,Dif_E_TOT,E_total=vqe.VQE_HeH_plus(r_AB,"simulador_ruidoso","ibm_kingston",n_shots,cobyla.funcion_objetivo_Agrupada,None) 
 
     cob2,Min_E2,Min_E_TOT2,Dif_E_TOT2,E_total2=vqe.VQE_HeH_plus(r_AB,"simulador",None,n_shots,cobyla.funcion_objetivo_Agrupada,None) 
 
